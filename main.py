@@ -75,81 +75,82 @@ print("Testing labels shape:", y_test.shape)
 # print("Testing set sample:")
 # print(test_df.head())
 
-# # 设置参数
-# vocab_size = 10000  # 词汇表大小，与Tokenizer中使用的num_words相同
-# max_len = 500       # 与pad_sequences使用的maxlen相同
-# embedding_dim = 128  # 嵌入层的维度
-#
-# # 构建模型
-# model = Sequential()
-# model.add(Embedding(input_dim=vocab_size, output_dim=embedding_dim, input_length=max_len))
-# model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2))
-# model.add(Dense(1, activation='sigmoid'))  # 使用sigmoid激活函数，因为这是一个二分类问题
-#
-# # 编译模型
-# model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-# # 训练模型
-# history = model.fit(X_train, y_train, epochs=10, batch_size=64, validation_data=(X_test, y_test))
-# # 评估模型
-# test_loss, test_acc = model.evaluate(X_test, y_test)
-# print("Test Loss: ", test_loss)
-# print("Test Accuracy: ", test_acc)
-#
-# # 保存模型
-# model.save('LSTMmoxing.h5')  # 保存为HDF5文件
-#
-#
-#
-# # 绘制训练和验证的准确率
-# plt.figure()
-# plt.plot(history.history['accuracy'], label='train_acc')
-# plt.plot(history.history['val_accuracy'], label='val_acc')
-# plt.title('Model accuracy')
-# plt.ylabel('Accuracy')
-# plt.xlabel('Epoch')
-# plt.legend(loc='upper left')
-# plt.show()
-#
-# # 绘制训练和验证的损失值
-# plt.figure()
-# plt.plot(history.history['loss'], label='train_loss')
-# plt.plot(history.history['val_loss'], label='val_loss')
-# plt.title('Model loss')
-# plt.ylabel('Loss')
-# plt.xlabel('Epoch')
-# plt.legend(loc='upper left')
-# plt.show()
+def modelTraining():
+# 设置参数
+vocab_size = 10000  # 词汇表大小，与Tokenizer中使用的num_words相同
+max_len = 500       # 与pad_sequences使用的maxlen相同
+embedding_dim = 128  # 嵌入层的维度
+
+# 构建模型
+model = Sequential()
+model.add(Embedding(input_dim=vocab_size, output_dim=embedding_dim, input_length=max_len))
+model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2))
+model.add(Dense(1, activation='sigmoid'))  # 使用sigmoid激活函数，因为这是一个二分类问题
+
+# 编译模型
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+# 训练模型
+history = model.fit(X_train, y_train, epochs=10, batch_size=64, validation_data=(X_test, y_test))
+# 评估模型
+test_loss, test_acc = model.evaluate(X_test, y_test)
+print("Test Loss: ", test_loss)
+print("Test Accuracy: ", test_acc)
+
+# 保存模型
+model.save('LSTMmoxing.h5')  # 保存为HDF5文件
+
+
+
+# 绘制训练和验证的准确率
+plt.figure()
+plt.plot(history.history['accuracy'], label='train_acc')
+plt.plot(history.history['val_accuracy'], label='val_acc')
+plt.title('Model accuracy')
+plt.ylabel('Accuracy')
+plt.xlabel('Epoch')
+plt.legend(loc='upper left')
+plt.show()
+
+# 绘制训练和验证的损失值
+plt.figure()
+plt.plot(history.history['loss'], label='train_loss')
+plt.plot(history.history['val_loss'], label='val_loss')
+plt.title('Model loss')
+plt.ylabel('Loss')
+plt.xlabel('Epoch')
+plt.legend(loc='upper left')
+plt.show()
 
 model = tf.keras.models.load_model('LSTMmoxing.h5')
-#
-#
-#
-# # 预测测试集
-# y_pred = model.predict(X_test)
-# y_pred = (y_pred > 0.5).astype(int)  # 由于使用sigmoid，需要转换概率为二进制输出
-#
-# # 计算精确度、召回率和F1分数
-# precision = precision_score(y_test, y_pred)
-# recall = recall_score(y_test, y_pred)
-# f1 = f1_score(y_test, y_pred)
-#
-# print(f'Precision: {precision:.4f}')
-# print(f'Recall: {recall:.4f}')
-# print(f'F1 Score: {f1:.4f}')
-#
-# # 绘制混淆矩阵
-# cm = confusion_matrix(y_test, y_pred)
-# plt.figure(figsize=(6,6))
-# plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
-# plt.title('Confusion Matrix')
-# plt.colorbar()
-# tick_marks = np.arange(2)
-# plt.xticks(tick_marks, ['Negative', 'Positive'], rotation=45)
-# plt.yticks(tick_marks, ['Negative', 'Positive'])
-# plt.xlabel('Predicted Label')
-# plt.ylabel('True Label')
-# plt.grid(False)
-# plt.show()
+
+
+def calibrationConfusionMaitrix(X_test):
+    # 预测测试集
+y_pred = model.predict(X_test)
+y_pred = (y_pred > 0.5).astype(int)  # 由于使用sigmoid，需要转换概率为二进制输出
+
+# 计算精确度、召回率和F1分数
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+
+print(f'Precision: {precision:.4f}')
+print(f'Recall: {recall:.4f}')
+print(f'F1 Score: {f1:.4f}')
+
+# 绘制混淆矩阵
+cm = confusion_matrix(y_test, y_pred)
+plt.figure(figsize=(6,6))
+plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+plt.title('Confusion Matrix')
+plt.colorbar()
+tick_marks = np.arange(2)
+plt.xticks(tick_marks, ['Negative', 'Positive'], rotation=45)
+plt.yticks(tick_marks, ['Negative', 'Positive'])
+plt.xlabel('Predicted Label')
+plt.ylabel('True Label')
+plt.grid(False)
+plt.show()
 
 
 
