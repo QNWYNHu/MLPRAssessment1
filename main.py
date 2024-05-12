@@ -124,7 +124,7 @@ model = tf.keras.models.load_model('LSTMmoxing.h5')
 
 
 
-    # 预测测试集
+# 预测测试集
 y_pred = model.predict(X_test)
 y_pred = (y_pred > 0.5).astype(int)  # 由于使用sigmoid，需要转换概率为二进制输出
 
