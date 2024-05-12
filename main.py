@@ -75,7 +75,6 @@ print("Testing labels shape:", y_test.shape)
 # print("Testing set sample:")
 # print(test_df.head())
 
-def modelTraining():
 # 设置参数
 vocab_size = 10000  # 词汇表大小，与Tokenizer中使用的num_words相同
 max_len = 500       # 与pad_sequences使用的maxlen相同
