@@ -75,107 +75,132 @@ print("Testing labels shape:", y_test.shape)
 # print("Testing set sample:")
 # print(test_df.head())
 
-# 设置参数
-vocab_size = 10000  # 词汇表大小，与Tokenizer中使用的num_words相同
-max_len = 500       # 与pad_sequences使用的maxlen相同
-embedding_dim = 128  # 嵌入层的维度
-
-# 构建模型
-model = Sequential()
-model.add(Embedding(input_dim=vocab_size, output_dim=embedding_dim, input_length=max_len))
-model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2))
-model.add(Dense(1, activation='sigmoid'))  # 使用sigmoid激活函数，因为这是一个二分类问题
-
-# 编译模型
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-# 训练模型
-history = model.fit(X_train, y_train, epochs=10, batch_size=64, validation_data=(X_test, y_test))
-# 评估模型
-test_loss, test_acc = model.evaluate(X_test, y_test)
-print("Test Loss: ", test_loss)
-print("Test Accuracy: ", test_acc)
-
-# 保存模型
-model.save('LSTMmoxing.h5')  # 保存为HDF5文件
-
-
-
-# 绘制训练和验证的准确率
-plt.figure()
-plt.plot(history.history['accuracy'], label='train_acc')
-plt.plot(history.history['val_accuracy'], label='val_acc')
-plt.title('Model accuracy')
-plt.ylabel('Accuracy')
-plt.xlabel('Epoch')
-plt.legend(loc='upper left')
-plt.show()
-
-# 绘制训练和验证的损失值
-plt.figure()
-plt.plot(history.history['loss'], label='train_loss')
-plt.plot(history.history['val_loss'], label='val_loss')
-plt.title('Model loss')
-plt.ylabel('Loss')
-plt.xlabel('Epoch')
-plt.legend(loc='upper left')
-plt.show()
+# # 设置参数
+# vocab_size = 10000  # 词汇表大小，与Tokenizer中使用的num_words相同
+# max_len = 500       # 与pad_sequences使用的maxlen相同
+# embedding_dim = 128  # 嵌入层的维度
+#
+# # 构建模型
+# model = Sequential()
+# model.add(Embedding(input_dim=vocab_size, output_dim=embedding_dim, input_length=max_len))
+# model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2))
+# model.add(Dense(1, activation='sigmoid'))  # 使用sigmoid激活函数，因为这是一个二分类问题
+#
+# # 编译模型
+# model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+# # 训练模型
+# history = model.fit(X_train, y_train, epochs=10, batch_size=64, validation_data=(X_test, y_test))
+# # 评估模型
+# test_loss, test_acc = model.evaluate(X_test, y_test)
+# print("Test Loss: ", test_loss)
+# print("Test Accuracy: ", test_acc)
+#
+# # 保存模型
+# model.save('LSTMmoxing.h5')  # 保存为HDF5文件
+#
+#
+#
+# # 绘制训练和验证的准确率
+# plt.figure()
+# plt.plot(history.history['accuracy'], label='train_acc')
+# plt.plot(history.history['val_accuracy'], label='val_acc')
+# plt.title('Model accuracy')
+# plt.ylabel('Accuracy')
+# plt.xlabel('Epoch')
+# plt.legend(loc='upper left')
+# plt.show()
+#
+# # 绘制训练和验证的损失值
+# plt.figure()
+# plt.plot(history.history['loss'], label='train_loss')
+# plt.plot(history.history['val_loss'], label='val_loss')
+# plt.title('Model loss')
+# plt.ylabel('Loss')
+# plt.xlabel('Epoch')
+# plt.legend(loc='upper left')
+# plt.show()
 
 model = tf.keras.models.load_model('LSTMmoxing.h5')
 
 
 
-# 预测测试集
-y_pred = model.predict(X_test)
-y_pred = (y_pred > 0.5).astype(int)  # 由于使用sigmoid，需要转换概率为二进制输出
+# # 预测测试集
+# y_pred = model.predict(X_test)
+# y_pred = (y_pred > 0.5).astype(int)  # 由于使用sigmoid，需要转换概率为二进制输出
+#
+# # 计算精确度、召回率和F1分数
+# precision = precision_score(y_test, y_pred)
+# recall = recall_score(y_test, y_pred)
+# f1 = f1_score(y_test, y_pred)
+#
+# print(f'Precision: {precision:.4f}')
+# print(f'Recall: {recall:.4f}')
+# print(f'F1 Score: {f1:.4f}')
+#
+# # 绘制混淆矩阵
+# cm = confusion_matrix(y_test, y_pred)
+# plt.figure(figsize=(6,6))
+# plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+# plt.title('Confusion Matrix')
+# plt.colorbar()
+# tick_marks = np.arange(2)
+# plt.xticks(tick_marks, ['Negative', 'Positive'], rotation=45)
+# plt.yticks(tick_marks, ['Negative', 'Positive'])
+# plt.xlabel('Predicted Label')
+# plt.ylabel('True Label')
+# plt.grid(False)
+# plt.show()
 
-# 计算精确度、召回率和F1分数
-precision = precision_score(y_test, y_pred)
-recall = recall_score(y_test, y_pred)
-f1 = f1_score(y_test, y_pred)
 
-print(f'Precision: {precision:.4f}')
-print(f'Recall: {recall:.4f}')
-print(f'F1 Score: {f1:.4f}')
 
-# 绘制混淆矩阵
-cm = confusion_matrix(y_test, y_pred)
-plt.figure(figsize=(6,6))
-plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
-plt.title('Confusion Matrix')
-plt.colorbar()
-tick_marks = np.arange(2)
-plt.xticks(tick_marks, ['Negative', 'Positive'], rotation=45)
-plt.yticks(tick_marks, ['Negative', 'Positive'])
-plt.xlabel('Predicted Label')
-plt.ylabel('True Label')
-plt.grid(False)
+# y_train = y_train.reset_index(drop=True)
+# # 参数设置
+# n_splits = 5
+# skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
+#
+# # 准备交叉验证
+# acc_scores = []
+# loss_scores = []
+#
+# for train_index, val_index in skf.split(X_train, y_train):
+#     X_train_fold, X_val_fold = X_train[train_index], X_train[val_index]
+#     y_train_fold, y_val_fold = y_train[train_index], y_train[val_index]
+#
+#     # 训练模型
+#     history = model.fit(X_train_fold, y_train_fold,
+#                         validation_data=(X_val_fold, y_val_fold),
+#                         epochs=1, batch_size=64, verbose=0)  # verbose=0为了减少输出信息
+#
+#     # 计算验证分数
+#     val_loss, val_acc = model.evaluate(X_val_fold, y_val_fold, verbose=0)
+#     acc_scores.append(val_acc)
+#     loss_scores.append(val_loss)
+#
+# # 输出平均交叉验证分数
+# print(f'Average Validation Accuracy: {np.mean(acc_scores):.4f} +/- {np.std(acc_scores):.4f}')
+# print(f'Average Validation Loss: {np.mean(loss_scores):.4f}')
+
+
+
+##ROC 曲线
+from sklearn.metrics import roc_curve, auc
+import matplotlib.pyplot as plt
+
+# 预测概率
+y_pred_probs = model.predict(X_test)
+
+# 计算ROC曲线的参数
+fpr, tpr, thresholds = roc_curve(y_test, y_pred_probs)
+roc_auc = auc(fpr, tpr)  # 计算AUC
+
+# 绘制ROC曲线
+plt.figure()
+plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic By LSTM')
+plt.legend(loc="lower right")
 plt.show()
-
-
-
-y_train = y_train.reset_index(drop=True)
-# 参数设置
-n_splits = 5
-skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
-
-# 准备交叉验证
-acc_scores = []
-loss_scores = []
-
-for train_index, val_index in skf.split(X_train, y_train):
-    X_train_fold, X_val_fold = X_train[train_index], X_train[val_index]
-    y_train_fold, y_val_fold = y_train[train_index], y_train[val_index]
-
-    # 训练模型
-    history = model.fit(X_train_fold, y_train_fold,
-                        validation_data=(X_val_fold, y_val_fold),
-                        epochs=1, batch_size=64, verbose=0)  # verbose=0为了减少输出信息
-
-    # 计算验证分数
-    val_loss, val_acc = model.evaluate(X_val_fold, y_val_fold, verbose=0)
-    acc_scores.append(val_acc)
-    loss_scores.append(val_loss)
-
-# 输出平均交叉验证分数
-print(f'Average Validation Accuracy: {np.mean(acc_scores):.4f} +/- {np.std(acc_scores):.4f}')
-print(f'Average Validation Loss: {np.mean(loss_scores):.4f}')

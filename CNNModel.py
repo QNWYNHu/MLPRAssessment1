@@ -104,7 +104,7 @@ print("Testing labels shape:", y_test.shape)
 model = tf.keras.models.load_model('CNNmoxing.h5')
 
 
-#
+
 # # 预测测试集
 # y_pred = model.predict(X_test)
 # y_pred = (y_pred > 0.5).astype(int)  # 由于使用sigmoid，需要转换概率为二进制输出
@@ -122,7 +122,7 @@ model = tf.keras.models.load_model('CNNmoxing.h5')
 # cm = confusion_matrix(y_test, y_pred)
 # plt.figure(figsize=(6,6))
 # plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
-# plt.title('Confusion Matrix')
+# plt.title('Confusion Matrix By CNN for Sentiment Classification')
 # plt.colorbar()
 # tick_marks = np.arange(2)
 # plt.xticks(tick_marks, ['Negative', 'Positive'], rotation=45)
@@ -133,30 +133,55 @@ model = tf.keras.models.load_model('CNNmoxing.h5')
 # plt.show()
 
 
+#使用双交叉验证增强模型
+# y_train = y_train.reset_index(drop=True)
+# # 参数设置
+# n_splits = 5
+# skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
+#
+# # 准备交叉验证
+# acc_scores = []
+# loss_scores = []
+#
+# for train_index, val_index in skf.split(X_train, y_train):
+#     X_train_fold, X_val_fold = X_train[train_index], X_train[val_index]
+#     y_train_fold, y_val_fold = y_train[train_index], y_train[val_index]
+#
+#     # 训练模型
+#     history = model.fit(X_train_fold, y_train_fold,
+#                         validation_data=(X_val_fold, y_val_fold),
+#                         epochs=1, batch_size=64, verbose=0)  # verbose=0为了减少输出信息
+#     model.save('CNNmoxing.h5')  # 保存为HDF5文件
+#     # 计算验证分数
+#     val_loss, val_acc = model.evaluate(X_val_fold, y_val_fold, verbose=0)
+#     acc_scores.append(val_acc)
+#     loss_scores.append(val_loss)
+#
+# # 输出平均交叉验证分数
+# print(f'Average Validation Accuracy: {np.mean(acc_scores):.4f} +/- {np.std(acc_scores):.4f}')
+# print(f'Average Validation Loss: {np.mean(loss_scores):.4f}')
 
-y_train = y_train.reset_index(drop=True)
-# 参数设置
-n_splits = 5
-skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
 
-# 准备交叉验证
-acc_scores = []
-loss_scores = []
 
-for train_index, val_index in skf.split(X_train, y_train):
-    X_train_fold, X_val_fold = X_train[train_index], X_train[val_index]
-    y_train_fold, y_val_fold = y_train[train_index], y_train[val_index]
+##ROC 曲线
+from sklearn.metrics import roc_curve, auc
+import matplotlib.pyplot as plt
 
-    # 训练模型
-    history = model.fit(X_train_fold, y_train_fold,
-                        validation_data=(X_val_fold, y_val_fold),
-                        epochs=1, batch_size=64, verbose=0)  # verbose=0为了减少输出信息
+# 预测概率
+y_pred_probs = model.predict(X_test)
 
-    # 计算验证分数
-    val_loss, val_acc = model.evaluate(X_val_fold, y_val_fold, verbose=0)
-    acc_scores.append(val_acc)
-    loss_scores.append(val_loss)
+# 计算ROC曲线的参数
+fpr, tpr, thresholds = roc_curve(y_test, y_pred_probs)
+roc_auc = auc(fpr, tpr)  # 计算AUC
 
-# 输出平均交叉验证分数
-print(f'Average Validation Accuracy: {np.mean(acc_scores):.4f} +/- {np.std(acc_scores):.4f}')
-print(f'Average Validation Loss: {np.mean(loss_scores):.4f}')
+# 绘制ROC曲线
+plt.figure()
+plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic By CNN')
+plt.legend(loc="lower right")
+plt.show()
